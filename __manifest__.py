@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Users Limits",
-    "version": "17.0.0.0",
+    "version": "17.0.0.1",
     "author": "Bytelegion",
     "website": "http://www.bytelegions.com",
     "depends": ["base"],
