@@ -7,18 +7,12 @@
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
 
+            <!-- You can control visibility in other ways in Odoo 17, but let's remove attrs for now -->
             <xpath expr="//field[@name='login']" position="after">
-
                 <group>
-                    <field name="set_users_limit" attrs="{'invisible': [('login', '!=', 'admin')]}"/>
+                    <field name="set_users_limit"/>
                 </group>
-
-<!--                <field name="set_users_limit"/>-->
             </xpath>
-
-            <!--            <xpath expr="//notebook/page/group/field[@name='tz']" position="before">-->
-            <!--                <field name="set_users_limit"/>-->
-            <!--            </xpath>-->
 
         </field>
     </record>
