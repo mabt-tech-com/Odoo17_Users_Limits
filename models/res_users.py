@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, models, fields
 from odoo.exceptions import UserError
-import logging
-from lxml import etree  # Import etree for XML parsing
-
-_logger = logging.getLogger(__name__)
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
@@ -12,16 +8,19 @@ class ResUsers(models.Model):
     set_users_limit = fields.Integer(string='Set User Limit', tracking=True)
 
     @api.model
-    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
-        res = super(ResUsers, self).fields_view_get(view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu)
+    def create(self, vals):
+        # Fetch all users and the admin user
+        users = self.env['res.users'].search([])
+        admin_user = self.env['res.users'].sudo().search([('login', '=', 'admin')], limit=1)
+
+        if not admin_user:
+            raise UserError("Admin user not found.")
         
-        # Add logging for debugging
-        _logger.info("User login: %s", self.env.user.login)
-        
-        if self.env.user.login != 'admin':
-            doc = etree.XML(res['arch'])
-            for node in doc.xpath("//field[@name='set_users_limit']"):
-                node.set('invisible', '1')  # Set field invisible if user is not 'admin'
-            res['arch'] = etree.tostring(doc, encoding='unicode')
-        
-        return res
+        # Get the user limit set by the admin
+        user_limit = admin_user.set_users_limit
+
+        if len(users) >= user_limit + 2:
+            raise UserError("Maximum number of users created. Please contact your system administrator.")
+
+        # Proceed with the creation of the user if the limit has not been reached
+        return super(ResUsers, self).create(vals)
